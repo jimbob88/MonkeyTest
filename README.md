@@ -13,10 +13,20 @@ and deleted, so the script doesn't waste your drive
 
 (!) Be sure, that the file you point to is not smthng
     you need, cause it'll be overwritten during test
-    
-Runs on both Python3 and 2, despite that I prefer 3. 
-Has been tested on 3.5 and 2.7 under ArchLinux
 
+Has been tested on 3.6.7 under Bionic
+May support python2 but this hasn't been extensively tested
+
+Installation:
+```
+sudo apt install python3-dev python3-tk
+sudo -H pip3 install matplotlib
+sudo -H pip3 install numpy
+```
+Usage for gui:
+```
+python3 monkeytest.py --mode gui
+```
 
 If You want to contribute, be sure to see our TODO list first
   https://github.com/thodnev/MonkeyTest/milestones
