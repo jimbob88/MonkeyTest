@@ -22,6 +22,7 @@ Installation:
 sudo apt install python3-dev python3-tk
 sudo -H pip3 install matplotlib
 sudo -H pip3 install numpy
+sudo -H pip3 install colorama
 ```
 Usage for gui:
 ```
