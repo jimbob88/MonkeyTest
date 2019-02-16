@@ -5,8 +5,8 @@ MonkeyTest -- a disk benchmark to test your hard drive read-write speed in Pytho
 A simplistic script to show that such system programming
 tasks are possible and convenient to be solved in Python
 
-I haven't done any command-line arguments parsing, so
-you should configure it using the constants at top of the script.
+~~I haven't done any command-line arguments parsing, so
+you should configure it using the constants at top of the script.~~
 
 The file is being created, then written with random data, randomly read
 and deleted, so the script doesn't waste your drive
