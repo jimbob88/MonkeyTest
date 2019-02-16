@@ -30,6 +30,6 @@ python3 monkeytest.py --mode gui
 ```
 
 If You want to contribute, be sure to see our TODO list first
-  https://github.com/thodnev/MonkeyTest/milestones
+  https://github.com/jimbob88/MonkeyTest/milestones
 
 ![monkeytest](https://cloud.githubusercontent.com/assets/16870636/12601547/7a3a4f14-c4aa-11e5-8b2e-48a20d7f7c17.png)
