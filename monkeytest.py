@@ -99,6 +99,14 @@ def get_args():
                         required=False,
                         default='cli',
                         help='Choose either CLI or GUI')
+    parser.add_argument('-g', '--graph',
+                        required=False,
+                        default=None,
+                        help='Save a GUI graph into a PNG, Options: Write, Read, Write+Read, Read+Write, Write/Read')
+    parser.add_argument('-gf', '--graph-file',
+                        required=False,
+                        default='/tmp/',
+                        help='Set graph save location (/tmp/)')
 
     args = parser.parse_args()
     return args
@@ -310,6 +318,7 @@ class benchmark_gui:
 
 
         benchmark = Benchmark(file,write_mb, write_block_kb, read_block_b)
+        self.benchmark = benchmark
         run_lb = tk.Label(self.main_frame, text='Running...')
         run_lb.grid(row=0, column=0, padx=5, pady=5)
         if self.show_progress.get():
@@ -323,17 +332,18 @@ class benchmark_gui:
         show_results = tk.Message(self.main_frame, text=benchmark.return_result(), justify='center')
         show_results.grid(columnspan=2, row=0, column=0)
 
-        self.read_graph = tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark))
+        self.read_graph = tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark, self.read_graph))
         self.read_graph.grid(row=1, column=0)
-        self.write_graph = tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark))
+        self.write_graph = tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark, self.write_graph))
         self.write_graph.grid(row=1, column=1)
         tk.Button(self.main_frame, text='Save JSON File', command=lambda: benchmark.get_json_result(filedialog.asksaveasfilename(initialdir = "~",title = "Save As", defaultextension='.json'))).grid(row=2, column=0)
         tk.Button(self.main_frame, text='Delete File', command=lambda: os.remove(file)).grid(row=2, column=1)
         benchmark.print_result()
 
-    def plot(self, rw, benchmark):
+    @classmethod
+    def plot(self, rw, benchmark, button=False, show=True):
         if rw == 'Read':
-            self.read_graph.configure(state="disabled")
+            if button is not False: button.configure(state="disabled")
             x = benchmark.read_took
             y = benchmark.rperc_took
             plt.plot(np.cumsum(x), y, label='Read')
@@ -342,7 +352,7 @@ class benchmark_gui:
             else:
                 plt.title('Write/Read Graph')
         elif rw == 'Write':
-            self.write_graph.configure(state="disabled")
+            if button is not False: button.configure(state="disabled")
             x = benchmark.write_took
             y = benchmark.wperc_took
             plt.plot(np.cumsum(x), y, label='Write')
@@ -354,7 +364,7 @@ class benchmark_gui:
         plt.legend(loc='upper left')
         plt.ylabel('Percent Complete (y)')
         plt.xlabel('Time taken (x)')
-        plt.show()
+        if show: plt.show()
 
 
 def main():
@@ -391,6 +401,30 @@ def main():
         root = tk.Tk()
         benchmark_gui_var = benchmark_gui(root, args.file, args.size, args.write_block_size, args.read_block_size)
         root.mainloop()
+
+    if args.graph is not None:
+        print(args.graph)
+        os.chdir(args.graph_file)
+        plt.clf()
+        benchmark = benchmark if args.mode.lower() != 'gui' else benchmark_gui_var.benchmark
+        if args.graph == 'Write'.casefold():
+            benchmark_gui.plot('Write', benchmark, show=False)
+            plt.savefig('graph.png')
+        elif args.graph == 'Read':
+            benchmark_gui.plot('Read', benchmark, show=False)
+            plt.savefig('graph.png')
+        elif args.graph == 'Write+Read'.casefold() or args.graph == 'Read+Write'.casefold():
+            benchmark_gui.plot('Write', benchmark, show=False)
+            benchmark_gui.plot('Read', benchmark, show=False)
+            plt.savefig('graph.png')
+        elif args.graph == 'Write/Read'.casefold() or args.graph == 'Read/Write'.casefold():
+            benchmark_gui.plot('Write', benchmark, show=False)
+            plt.savefig('graph1.png')
+            plt.clf()
+            benchmark_gui.plot('Read', benchmark, show=False)
+            plt.savefig('graph2.png')
+
+
 
 if __name__ == "__main__":
     main()
