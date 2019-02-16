@@ -324,6 +324,8 @@ class benchmark_gui:
 
         tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark)).grid(row=1, column=0)
         tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark)).grid(row=1, column=1)
+        tk.Button(self.main_frame, text='Save JSON File', command=lambda: benchmark.get_json_result(filedialog.asksaveasfilename(initialdir = "~",title = "Save As", defaultextension='.json'))).grid(row=2, column=0)
+        tk.Button(self.main_frame, text='Delete File', command=lambda: os.remove(file)).grid(row=2, column=1)
         benchmark.print_result()
 
     def plot(self, rw, benchmark):
