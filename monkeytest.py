@@ -344,8 +344,8 @@ class benchmark_gui:
     def plot(self, rw, benchmark, button=False, show=True):
         if rw == 'Read':
             if button is not False: button.configure(state="disabled")
-            x = benchmark.read_took
-            y = benchmark.rperc_took
+            x = [0, *benchmark.read_took]
+            y = [0, *benchmark.rperc_took]
             plt.plot(np.cumsum(x), y, label='Read')
             if plt.gca().get_title() == '':
                 plt.title('Read Graph')
@@ -353,8 +353,8 @@ class benchmark_gui:
                 plt.title('Write/Read Graph')
         elif rw == 'Write':
             if button is not False: button.configure(state="disabled")
-            x = benchmark.write_took
-            y = benchmark.wperc_took
+            x = [0, *benchmark.write_took]
+            y = [0, *benchmark.wperc_took]
             plt.plot(np.cumsum(x), y, label='Write')
             if plt.gca().get_title() == '':
                 plt.title('Write Graph')
