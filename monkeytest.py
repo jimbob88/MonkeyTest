@@ -106,7 +106,7 @@ def get_args():
     parser.add_argument('-gf', '--graph-file',
                         required=False,
                         default='/tmp/',
-                        help='Set graph save location (/tmp/)')
+                        help='Set graph save location')
 
     args = parser.parse_args()
     return args
