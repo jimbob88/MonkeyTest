@@ -10,6 +10,9 @@ and deleted, so the script doesn't waste your drive
 (!) Be sure, that the file you point to is not something
     you need, cause it'll be overwritten during test
 
+Runs on both Python3 and 2, despite that I prefer 3
+Has been tested on 3.5 and 2.7 under ArchLinux
+Has been tested on 3.5.2 under Ubuntu Xenial
 Has been tested on 3.6.7 under Ubuntu Bionic
 '''
 from __future__ import division, print_function  # for compatability with py2
@@ -28,6 +31,7 @@ import argparse
 import json
 import matplotlib.pyplot as plt
 import numpy as np
+import colorama as col
 #from threading import Thread
 
 ASCIIART = r'''Brought to you by coding monkeys.
@@ -337,6 +341,25 @@ def main():
 
     args = get_args()
     if args.mode.lower() == 'cli':
+        if os.path.isfile(args.file):
+            if input('Are you sure you wish to continue? Selected file will be deleted. (Y/N) ') == 'Y'.casefold():
+                os.remove(args.file)
+            else:
+                print('Terminated')
+                exit()
+        if int(args.size) <= 0:
+            print('{yellow}Total MB to write is smaller than or equal to 0, assuming default value of{end} {red}(128){end}'.format(
+                yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+            args.size = 128
+        if int(args.write_block_size) <= 0:
+            print('{yellow}The block size for writing in bytes is smaller than or equal to 0, assuming default value of{end} {red}(1024){end}'.format(
+                yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+            args.write_block_size = 1024
+        if int(args.read_block_size) <= 0:
+            print('{yellow}The block size for reading in bytes is smaller than or equal to 0, assuming default value of{end} {red}(512){end}'.format(
+                yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+            args.read_block_size = 512
+
         benchmark = Benchmark(args.file, args.size, args.write_block_size, args.read_block_size)
         benchmark.run()
         if args.json is not None:
