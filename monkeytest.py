@@ -20,10 +20,12 @@ try:
     import Tkinter as tk
     import ttk
     import tkFileDialog as filedialog
+    import tkMessageBox as messagebox
 except ModuleNotFoundError:
     import tkinter as tk
     import tkinter.ttk as ttk
     from tkinter import filedialog
+    from tkinter import messagebox
 
 import os, sys
 from random import shuffle
@@ -262,15 +264,15 @@ class benchmark_gui:
         ttk.Button(self.main_frame, text='Open', command=lambda: self.current_file.set(filedialog.asksaveasfilename(initialdir = "~",title = "Save As" ))).grid(row=1, column=2, padx=5, pady=5)
 
         ttk.Label(self.main_frame, text='Write MB').grid(row=2, column=1, padx=5, pady=5)
-        self.write_mb_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.write_mb, width=8)
+        self.write_mb_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.write_mb, width=8, from_=0, to=999999)
         self.write_mb_spinbox.grid(row=2, column=2, padx=5, pady=5)
 
         ttk.Label(self.main_frame, text='Write Block KB').grid(row=3, column=1, padx=5, pady=5)
-        self.write_block_kb_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.write_block_kb, width=8)
+        self.write_block_kb_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.write_block_kb, width=8, from_=0, to=999999)
         self.write_block_kb_spinbox.grid(row=3, column=2, padx=5, pady=5)
 
         ttk.Label(self.main_frame, text='Read Block B').grid(row=4, column=1, padx=5, pady=5)
-        self.read_block_b_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.read_block_b, width=8)
+        self.read_block_b_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.read_block_b, width=8, from_=0, to=999999)
         self.read_block_b_spinbox.grid(row=4, column=2, padx=5, pady=5)
 
         tk.Checkbutton(self.main_frame, text='Show Progress', variable=self.show_progress).grid(row=5, column=1, columnspan=2)
@@ -279,10 +281,19 @@ class benchmark_gui:
         #file,write_mb, write_block_kb, read_block_b
 
     def run(self):
-        if self.write_mb.get() <= 0: self.write_mb.set(1)
-        if self.write_block_kb.get() <= 0: self.write_mb.set(1)
-        if self.read_block_b.get() <= 0: self.write_mb.set(1)
-        if self.current_file.get() == '': self.current_file.set('/tmp/monkeytest')
+        dummy_check = {'Size': self.write_mb.get(), 'Write Block': self.write_block_kb.get(), 'Read Block': self.read_block_b.get()}
+        if any(v <= 0 for v in dummy_check.values()):
+            cont = messagebox.askquestion('Dummy Check Failure', 'One or more value(s) smaller than or equal to 0, Would you like to set these numbers to defaults?', icon = 'warning')
+            if cont != 'yes':
+                return
+        if dummy_check['Size'] <= 0: self.write_mb.set(128)
+        if dummy_check['Write Block'] <= 0: self.write_mb.set(1)
+        if dummy_check['Read Block'] <= 0: self.write_mb.set(1)
+        if self.current_file.get() == '':
+            def_file = messagebox.askquestion('No File Selected', 'You have not selected a file, Would you like the default file to be selected?')
+            if def_file != 'yes':
+                return
+            self.current_file.set('/tmp/monkeytest')
 
         file = self.current_file.get()
         write_mb = self.write_mb.get()
