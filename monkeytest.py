@@ -255,9 +255,6 @@ class benchmark_gui:
         self.show_progress = tk.IntVar()
         self.show_progress.set(1)
 
-        self.show_graphs = tk.IntVar()
-        self.show_graphs.set(0)
-
         self.initialize()
 
     def initialize(self):
@@ -276,9 +273,7 @@ class benchmark_gui:
         self.read_block_b_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.read_block_b, width=8)
         self.read_block_b_spinbox.grid(row=4, column=2, padx=5, pady=5)
 
-        tk.Checkbutton(self.main_frame, text='Show Progress', variable=self.show_progress).grid(row=5, column=1)
-        tk.Checkbutton(self.main_frame, text='Show Graphs', variable=self.show_graphs).grid(row=5, column=2)
-
+        tk.Checkbutton(self.main_frame, text='Show Progress', variable=self.show_progress).grid(row=5, column=1, columnspan=2)
         ttk.Button(self.main_frame, text='Run Monkey Test', command=self.run).grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
         #file,write_mb, write_block_kb, read_block_b
@@ -305,13 +300,9 @@ class benchmark_gui:
         benchmark = Benchmark(file,write_mb, write_block_kb, read_block_b)
         run_lb = tk.Label(self.main_frame, text='Running...')
         run_lb.grid(row=0, column=0, padx=5, pady=5)
-        if self.show_progress.get() and not self.show_graphs.get():
+        if self.show_progress.get():
             benchmark.run(update_pb=perc_comp_pb, show_progress=False)
-        if self.show_progress.get() and self.show_graphs.get():
-            benchmark.run(update_pb=perc_comp_pb, show_progress=False)
-        if not self.show_progress.get() and not self.show_graphs.get():
-            benchmark.run(show_progress=False)
-        if not self.show_progress.get() and self.show_progress.get():
+        if not self.show_progress.get():
             benchmark.run(show_progress=False)
 
         perc_comp_pb.destroy()
