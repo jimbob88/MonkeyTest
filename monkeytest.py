@@ -287,8 +287,8 @@ class benchmark_gui:
             if cont != 'yes':
                 return
         if dummy_check['Size'] <= 0: self.write_mb.set(128)
-        if dummy_check['Write Block'] <= 0: self.write_mb.set(1)
-        if dummy_check['Read Block'] <= 0: self.write_mb.set(1)
+        if dummy_check['Write Block'] <= 0: self.write_mb.set(1024)
+        if dummy_check['Read Block'] <= 0: self.write_mb.set(512)
         if self.current_file.get() == '':
             def_file = messagebox.askquestion('No File Selected', 'You have not selected a file, Would you like the default file to be selected?')
             if def_file != 'yes':
