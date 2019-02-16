@@ -32,6 +32,7 @@ from random import shuffle
 import argparse
 import json
 import matplotlib.pyplot as plt
+import matplotlib.ticker as plticker
 import numpy as np
 import colorama as col
 #from threading import Thread
@@ -322,23 +323,38 @@ class benchmark_gui:
         show_results = tk.Message(self.main_frame, text=benchmark.return_result(), justify='center')
         show_results.grid(columnspan=2, row=0, column=0)
 
-        tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark)).grid(row=1, column=0)
-        tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark)).grid(row=1, column=1)
+        self.read_graph = tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark))
+        self.read_graph.grid(row=1, column=0)
+        self.write_graph = tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark))
+        self.write_graph.grid(row=1, column=1)
         tk.Button(self.main_frame, text='Save JSON File', command=lambda: benchmark.get_json_result(filedialog.asksaveasfilename(initialdir = "~",title = "Save As", defaultextension='.json'))).grid(row=2, column=0)
         tk.Button(self.main_frame, text='Delete File', command=lambda: os.remove(file)).grid(row=2, column=1)
         benchmark.print_result()
 
     def plot(self, rw, benchmark):
         if rw == 'Read':
-            plt.plot(np.cumsum(benchmark.read_took), benchmark.rperc_took)
-            plt.ylabel('Percent Complete (y)')
-            plt.xlabel('Time taken (x)')
-            plt.show()
+            self.read_graph.configure(state="disabled")
+            x = benchmark.read_took
+            y = benchmark.rperc_took
+            plt.plot(np.cumsum(x), y, label='Read')
+            if plt.gca().get_title() == '':
+                plt.title('Read Graph')
+            else:
+                plt.title('Write/Read Graph')
         elif rw == 'Write':
-            plt.plot(np.cumsum(benchmark.write_took), benchmark.wperc_took)
-            plt.ylabel('Percent Complete (y)')
-            plt.xlabel('Time taken (x)')
-            plt.show()
+            self.write_graph.configure(state="disabled")
+            x = benchmark.write_took
+            y = benchmark.wperc_took
+            plt.plot(np.cumsum(x), y, label='Write')
+            if plt.gca().get_title() == '':
+                plt.title('Write Graph')
+            else:
+                plt.title('Read/Write Graph')
+
+        plt.legend(loc='upper left')
+        plt.ylabel('Percent Complete (y)')
+        plt.xlabel('Time taken (x)')
+        plt.show()
 
 
 def main():
