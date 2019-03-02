@@ -35,7 +35,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as plticker
 import numpy as np
 import colorama as col
-#from threading import Thread
 
 ASCIIART = r'''Brought to you by coding monkeys.
 Eat bananas, drink coffee & enjoy!
@@ -98,7 +97,7 @@ def get_args():
     parser.add_argument('-m', '--mode',
                         required=False,
                         default='cli',
-                        help='Choose either CLI or GUI')
+                        help='Choose either CLI or GUI or TUI')
     parser.add_argument('-g', '--graph',
                         required=False,
                         default=None,
@@ -401,6 +400,82 @@ def main():
         root = tk.Tk()
         benchmark_gui_var = benchmark_gui(root, args.file, args.size, args.write_block_size, args.read_block_size)
         root.mainloop()
+    elif args.mode.lower() == 'tui':
+        try:
+            from picotui.context import Context
+            from picotui.screen import Screen
+            import picotui.widgets as ptwidgets
+            import picotui.defs as ptdefs
+            import picotui.dialogs as ptdialog
+        except:
+            exit()
+
+        with Context():
+            Screen.attr_color(ptdefs.C_WHITE, ptdefs.C_BLUE)
+            Screen.cls()
+            Screen.attr_reset()
+            dialog = ptwidgets.Dialog(0, 0, 50, 12)
+
+            dialog.add(10, 1, "File:")
+            current_file = ptwidgets.WTextEntry(20, args.file)
+            dialog.add(17, 1, current_file)
+
+            dialog.add(10, 3, "Write MB:")
+            write_mb = ptwidgets.WTextEntry(17, str(args.size))
+            dialog.add(20, 3, write_mb)
+
+            dialog.add(10, 5, "Write Block KB:")
+            write_block_kb = ptwidgets.WTextEntry(11, str(args.write_block_size))
+            dialog.add(26, 5, write_block_kb)
+
+            dialog.add(10, 7, "Read Block B:")
+            read_block_b = ptwidgets.WTextEntry(13, str(args.read_block_size))
+            dialog.add(24, 7, read_block_b)
+
+            ok_b = ptwidgets.WButton(8, "OK")
+            dialog.add(10, 16, ok_b)
+            ok_b.finish_dialog = ptwidgets.ACTION_OK
+
+            cancel_b = ptwidgets.WButton(8, "Cancel")
+            dialog.add(30, 16, cancel_b)
+            cancel_b.finish_dialog = ptwidgets.ACTION_CANCEL
+
+            res = dialog.loop()
+        if res == ptwidgets.ACTION_OK:
+            os.system('clear' if os.name == 'posix' else 'cls')
+            if os.path.isfile(current_file.get()):
+                with Context():
+                    res = ptdialog.DConfirmation("Are you sure you wish to continue? Selected file will be deleted", title="File Exists").result()
+                if res != ptwidgets.ACTION_OK:
+                    return main()
+            os.system('clear' if os.name == 'posix' else 'cls')
+            try:
+                args.size = int(write_mb.get())
+            except ValueError:
+                print('{yellow}Total MB to write is smaller than or equal to 0, assuming default value of{end} {red}(128){end}'.format(
+                    yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+                args.size = 128
+            try:
+                args.write_block_size = int(write_block_kb.get())
+            except ValueError:
+                print('{yellow}The block size for writing in bytes is smaller than or equal to 0, assuming default value of{end} {red}(1024){end}'.format(
+                    yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+                args.write_block_size = 1024
+            try:
+                args.read_block_size = int(read_block_b.get())
+            except ValueError:
+                print('{yellow}The block size for reading in bytes is smaller than or equal to 0, assuming default value of{end} {red}(512){end}'.format(
+                    yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
+                args.read_block_size = 512
+
+            benchmark = Benchmark(current_file.get(), args.size, args.write_block_size, args.read_block_size)
+            benchmark.run()
+            if args.json is not None:
+                benchmark.get_json_result(args.json)
+            else:
+                benchmark.print_result()
+            os.remove(args.file)
+
 
     if args.graph is not None:
         print(args.graph)
