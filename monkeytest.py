@@ -21,13 +21,20 @@ try:
     import ttk
     import tkFileDialog as filedialog
     import tkMessageBox as messagebox
-except ModuleNotFoundError:
+except ImportError:
     import tkinter as tk
     import tkinter.ttk as ttk
     from tkinter import filedialog
     from tkinter import messagebox
 
-import os, sys
+try:
+    import ttkthemes
+except:
+    pass
+
+import os
+import sys
+import platform
 from random import shuffle
 import argparse
 import json
@@ -36,7 +43,7 @@ import matplotlib.ticker as plticker
 import numpy as np
 import colorama as col
 
-ASCIIART = r'''Brought to you by coding monkeys.
+ASCIIART = '''Brought to you by coding monkeys.
 Eat bananas, drink coffee & enjoy!
                  _
                ,//)
@@ -283,7 +290,7 @@ class benchmark_gui:
         self.read_block_b_spinbox = tk.Spinbox(self.main_frame, justify='center', textvariable=self.read_block_b, width=8, from_=0, to=999999)
         self.read_block_b_spinbox.grid(row=4, column=2, padx=5, pady=5)
 
-        tk.Checkbutton(self.main_frame, text='Show Progress', variable=self.show_progress).grid(row=5, column=1, columnspan=2)
+        ttk.Checkbutton(self.main_frame, text='Show Progress', variable=self.show_progress).grid(row=5, column=1, columnspan=2)
         ttk.Button(self.main_frame, text='Run Monkey Test', command=self.run).grid(row=6, column=1, columnspan=2, padx=5, pady=5)
 
         #file,write_mb, write_block_kb, read_block_b
@@ -318,7 +325,7 @@ class benchmark_gui:
 
         benchmark = Benchmark(file,write_mb, write_block_kb, read_block_b)
         self.benchmark = benchmark
-        run_lb = tk.Label(self.main_frame, text='Running...')
+        run_lb = ttk.Label(self.main_frame, text='Running...')
         run_lb.grid(row=0, column=0, padx=5, pady=5)
         if self.show_progress.get():
             benchmark.run(update_pb=perc_comp_pb, show_progress=False)
@@ -331,20 +338,20 @@ class benchmark_gui:
         show_results = tk.Message(self.main_frame, text=benchmark.return_result(), justify='center')
         show_results.grid(columnspan=2, row=0, column=0)
 
-        self.read_graph = tk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark, self.read_graph))
+        self.read_graph = ttk.Button(self.main_frame, text='Read Graph', command=lambda: self.plot('Read', benchmark, self.read_graph))
         self.read_graph.grid(row=1, column=0)
-        self.write_graph = tk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark, self.write_graph))
+        self.write_graph = ttk.Button(self.main_frame, text='Write Graph', command=lambda: self.plot('Write', benchmark, self.write_graph))
         self.write_graph.grid(row=1, column=1)
-        tk.Button(self.main_frame, text='Save JSON File', command=lambda: benchmark.get_json_result(filedialog.asksaveasfilename(initialdir = "~",title = "Save As", defaultextension='.json'))).grid(row=2, column=0)
-        tk.Button(self.main_frame, text='Delete File', command=lambda: os.remove(file)).grid(row=2, column=1)
+        ttk.Button(self.main_frame, text='Save JSON File', command=lambda: benchmark.get_json_result(filedialog.asksaveasfilename(initialdir = "~",title = "Save As", defaultextension='.json'))).grid(row=2, column=0)
+        ttk.Button(self.main_frame, text='Delete File', command=lambda: os.remove(file)).grid(row=2, column=1)
         benchmark.print_result()
 
     @classmethod
     def plot(self, rw, benchmark, button=False, show=True):
         if rw == 'Read':
             if button is not False: button.configure(state="disabled")
-            x = [0, *benchmark.read_took]
-            y = [0, *benchmark.rperc_took]
+            x = [0] + benchmark.read_took
+            y = [0] + benchmark.rperc_took
             plt.plot(np.cumsum(x), y, label='Read')
             if plt.gca().get_title() == '':
                 plt.title('Read Graph')
@@ -352,8 +359,8 @@ class benchmark_gui:
                 plt.title('Write/Read Graph')
         elif rw == 'Write':
             if button is not False: button.configure(state="disabled")
-            x = [0, *benchmark.write_took]
-            y = [0, *benchmark.wperc_took]
+            x = [0] + benchmark.write_took
+            y = [0] + benchmark.wperc_took
             plt.plot(np.cumsum(x), y, label='Write')
             if plt.gca().get_title() == '':
                 plt.title('Write Graph')
@@ -397,9 +404,24 @@ def main():
             benchmark.print_result()
         os.remove(args.file)
     elif args.mode.lower() == 'gui':
-        root = tk.Tk()
-        benchmark_gui_var = benchmark_gui(root, args.file, args.size, args.write_block_size, args.read_block_size)
-        root.mainloop()
+        if 'ttkthemes' in sys.modules:
+            root = ttkthemes.ThemedTk()
+            benchmark_gui_var = benchmark_gui(root, args.file, args.size, args.write_block_size, args.read_block_size)
+            if platform.system() == 'Linux':
+                if platform.dist()[0] == 'Ubuntu':
+                    root.set_theme("ubuntu")
+                else:
+                    root.set_theme("equilux")
+            elif platform.system() == 'Windows':
+                root.set_theme("vista")
+            elif platform.system() == 'Darwin':
+                root.set_theme("aqua")
+            root.mainloop()
+        else:
+            root = tk.Tk()
+            benchmark_gui_var = benchmark_gui(root, args.file, args.size, args.write_block_size, args.read_block_size)
+            root.mainloop()
+
     elif args.mode.lower() == 'tui':
         try:
             from picotui.context import Context
