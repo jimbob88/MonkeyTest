@@ -43,7 +43,7 @@ import matplotlib.ticker as plticker
 import numpy as np
 import colorama as col
 
-ASCIIART = '''Brought to you by coding monkeys.
+ASCIIART = r'''Brought to you by coding monkeys.
 Eat bananas, drink coffee & enjoy!
                  _
                ,//)
@@ -430,6 +430,8 @@ def main():
             import picotui.defs as ptdefs
             import picotui.dialogs as ptdialog
         except:
+            print('{red}WARNING:{end} {yellow}picotui not installed, install it with the command:{end}\n\tpip install git+https://github.com/jimbob88/picotui-python2_3.git'.format(
+                yellow=col.Fore.YELLOW, end=col.Style.RESET_ALL, red=col.Fore.RED))
             exit()
 
         with Context():
@@ -525,3 +527,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
