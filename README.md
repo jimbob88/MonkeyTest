@@ -11,11 +11,11 @@ you should configure it using the constants at top of the script.~~
 The file is being created, then written with random data, randomly read
 and deleted, so the script doesn't waste your drive
 
-(!) Be sure, that the file you point to is not smthng
+(!) Be sure, that the file you point to is not somthing
     you need, cause it'll be overwritten during test
 
-Has been tested on 3.6.7 under Bionic
-May support python2 but this hasn't been extensively tested
+Has been tested on 3.6.7 under Bionic, seems to fully support Python 2.7 (As of 03/03/19)
+
 
 Installation:
 ```
