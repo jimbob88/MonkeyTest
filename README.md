@@ -33,3 +33,7 @@ If You want to contribute, be sure to see our TODO list first
   https://github.com/jimbob88/MonkeyTest/milestones
 
 ![monkeytest](https://cloud.githubusercontent.com/assets/16870636/12601547/7a3a4f14-c4aa-11e5-8b2e-48a20d7f7c17.png)
+
+![monkeytest GUI](https://user-images.githubusercontent.com/9913366/53694502-b3fc4d00-3da7-11e9-8ea9-7bb7fbd17d9b.png)
+
+![monkeytest TUI](https://user-images.githubusercontent.com/9913366/53694508-c8d8e080-3da7-11e9-8018-e5bab1cb8137.png)
