@@ -28,11 +28,14 @@ Usage for gui:
 ```
 python3 monkeytest.py --mode gui
 ```
-If you wish to use TUI on both Python2 and Python3 install picotui with:
+If you wish to use TUI on Python2 install picotui with:
 ```
-pip install git+https://github.com/jimbob88/picotui-python2_3.git
+pip install git+https://github.com/jimbob88/picotui-python2
 ```
-
+else:
+```
+pip install picotui
+```
 
 If You want to contribute, be sure to see our TODO list first
   https://github.com/jimbob88/MonkeyTest/milestones
